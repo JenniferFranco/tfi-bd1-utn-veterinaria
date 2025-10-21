@@ -19,6 +19,29 @@ asegurar la integridad. Al terminar, la base de datos queda lista
 CREATE DATABASE IF NOT EXISTS gestion_veterinaria;
 
 USE gestion_veterinaria;
+
+-- INICIO: BLOQUE DE IDEMPOTENCIA (Permite re-ejecutar el script)
+-- Desactiva temporalmente la validación de claves foráneas para permitir borrar las tablas.
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Borramos las tablas si ya existen.
+DROP TABLE IF EXISTS implantacion;
+DROP TABLE IF EXISTS mascota;
+DROP TABLE IF EXISTS veterinario;
+DROP TABLE IF EXISTS persona;
+DROP TABLE IF EXISTS veterinaria;
+DROP TABLE IF EXISTS direccion;
+DROP TABLE IF EXISTS cod_postal;
+DROP TABLE IF EXISTS raza;
+DROP TABLE IF EXISTS especie;
+DROP TABLE IF EXISTS provincia;
+DROP TABLE IF EXISTS microchip;
+
+-- Reactiva la validación de claves foráneas para el resto de la sesión.
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- FIN: BLOQUE DE IDEMPOTENCIA
+
 -- Catálogos de Ubicación
 -- PROVINCIAS (catálogo de provincias)
 CREATE TABLE provincia (
