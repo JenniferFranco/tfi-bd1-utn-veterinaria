@@ -42,7 +42,8 @@ El proyecto consiste en el diseño, implementación y prueba de una base de dato
 
 ## 🔗 Enlaces
 
-* **Video Demostrativo (YouTube):** \[*enlace del video*]
+* **Video Demostrativo (YouTube):**
+* https://youtu.be/Slymx88_xrc 
 
 * **Software Utilizado:**
     * [MySQL](https://www.mysql.com/)
