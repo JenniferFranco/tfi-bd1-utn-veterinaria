@@ -22,8 +22,6 @@ ORDER BY implantaciones_en_periodo DESC;
 -- ---------------------------------
 
 -- CONSULTA 2: Microchips activos con información de mascota y dueño
---  columna "eliminado":
-ALTER TABLE microchip ADD COLUMN eliminado BOOLEAN NOT NULL DEFAULT FALSE;
 
 SELECT 
   mc.id AS microchip_id,
