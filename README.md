@@ -15,14 +15,20 @@ El proyecto consiste en el diseño, implementación y prueba de una base de dato
     * **Etapa 3:** Consultas avanzadas (JOIN, GROUP BY/HAVING, Subconsultas), creación de vistas y análisis de rendimiento con/sin índices.
     * **Etapa 4:** Creación de usuarios con privilegios mínimos, vistas de seguridad y pruebas de integridad/anti-inyección.
     * **Etapa 5:** Simulación de *deadlocks*, implementación de transacciones con *retry* (procedimiento almacenado) y comparación de niveles de aislamiento.
-    * **Anexo IA:** Registro de las interacciones con herramientas de Inteligencia Artificial utilizadas como apoyo pedagógico.
-* **Scripts SQL:**
-    * `01_creacion_tablas.sql`: Script para crear la estructura completa de la base de datos, incluyendo tablas y todas las `constraints` (PK, FK, UNIQUE, CHECK).
-    * `02_carga_masiva.sql`: Script optimizado (`WITH RECURSIVE`) para generar y cargar un volumen significativo de datos (configurable, ej., 35,000 mascotas) respetando la integridad referencial.
-    * `03_consultas_avanzadas.sql`: Scripts de las consultas complejas, la creación de la vista y las pruebas de rendimiento.
-    * `04_seguridad.sql`: Scripts para la creación del usuario, asignación de permisos y creación de vistas de seguridad.
-    * `05_concurrencia.sql`: Scripts utilizados para la simulación de *deadlocks*, la creación del procedimiento almacenado transaccional y la comparación de niveles de aislamiento.
-* **Diagrama Entidad-Relación:** Imagen (`.png`) del DER final.
+* **Anexo IA (PDF):** Documento separado que registra las interacciones con herramientas de Inteligencia Artificial utilizadas como apoyo pedagógico.
+* **Presentación (PDF):** Diapositivas utilizadas para el video explicativo del proyecto.
+* **Carpeta `sql/`:**
+    * `01_esquema.sql`: Script que crea la estructura completa de la base de datos, incluyendo todas las tablas y sus `constraints` (PK, FK, UNIQUE, CHECK).
+    * `02_catalogos.sql`: Contiene las sentencias `INSERT` para poblar las tablas maestras o de catálogo (`provincia`, `especie`, `raza`).
+    * `03_carga_masiva.sql`: Script optimizado (`WITH RECURSIVE`) para generar y cargar el volumen masivo de datos (35,000+ mascotas) respetando la integridad referencial.
+    * `04_indices.sql`: Creación de los `INDEX` (Etapa 3) para optimizar el rendimiento de las consultas.
+    * `05_consultas.sql`: Scripts de las 4 consultas avanzadas (JOIN, GROUP BY, etc.) y las pruebas de `EXPLAIN` para el análisis de rendimiento (Etapa 3).
+    * `06_vistas.sql`: Creación de la vista de reporte (Etapa 3) y las vistas de seguridad (Etapa 4).
+    * `07_seguridad.sql`: Creación del usuario (`CREATE USER`), asignación de permisos (`GRANT`) y pruebas de acceso (Etapa 4).
+    * `08_transacciones.sql`: Creación del `PROCEDURE` almacenado con lógica transaccional y manejo de *deadlocks* con `RETRY` (Etapa 5).
+    * `09_concurrencia_guiada.sql`: Script de prueba para simular *deadlocks* y verificar los niveles de aislamiento (Etapa 5).
+    * `README.txt`: Archivo de texto que explica el orden de ejecución recomendado para todos los scripts.
+* **Diagrama Entidad-Relación:** Imagen (`.png` ) del DER final.
 
 ## 👥 Autores
 
@@ -30,7 +36,6 @@ El proyecto consiste en el diseño, implementación y prueba de una base de dato
 * Jonathan Franco (`nahuelfranco7@icloud.com`)
 * Claudio Fiorito (`Claudio80.cf@gmail.com`)
 * Diana Falla (`diana.falla.cba@gmail.com`)
-
 
 ## 🎓 Contexto Académico
 
@@ -43,11 +48,7 @@ El proyecto consiste en el diseño, implementación y prueba de una base de dato
 ## 🔗 Enlaces
 
 * **Video Demostrativo (YouTube):**
-* https://youtu.be/Slymx88_xrc 
-
-* **Software Utilizado:**
-    * [MySQL](https://www.mysql.com/)
-    * [MySQL Workbench](https://www.mysql.com/products/workbench/)
+    * https://youtu.be/Slymx88_xrc
 * **Software Utilizado:**
     * [MySQL](https://www.mysql.com/)
     * [MySQL Workbench](https://www.mysql.com/products/workbench/)
