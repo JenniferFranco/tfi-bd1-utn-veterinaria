@@ -1,24 +1,94 @@
-/*Este script crea las "Entidades Principales" de la base de datos 'gestion_veterinaria'. 
-Estas tablas incluyen:
- 1. Entidades Principales:
-- persona (super-entidad)
-- veterinaria
-- veterinario (rol de persona)
-- microchip
- - mascota
-2. Entidades de Eventos:
- - implantacion
+/* 
+Este script construye el "esqueleto" completo de la base de datos 
+'gestion_veterinaria'.
 
- Al final del script, se incluye un bloque de PRUEBAS DE INTEGRIDAD.
- Este bloque inserta datos de prueba válidos y luego ejecuta 
- inserciones y borrados erróneos de forma intencional para 
-corroborar que las constraints (UNIQUE, CHECK, FK, RESTRICT)
- funcionan como se espera, cumpliendo con los requisitos de la Etapa 1.
+Su función es crear TODAS las tablas en el orden de dependencia correcto,
+asegurando que las claves foráneas (FOREIGN KEY) se establezcan sin errores.
+
+ 1. Primero, crea las tablas de Catálogo (ej. 'provincia', 'especie') 
+que no dependen de ninguna otra.
+2. Segundo, crea las tablas de Entidades Principales (ej. 'mascota', 
+'persona', 'implantacion') que SÍ dependen de los catálogos.
+
+También define TODAS las constraints (PK, UNIQUE, CHECK) para
+asegurar la integridad. Al terminar, la base de datos queda lista 
+(pero vacía) para ser poblada por los siguientes scripts.
+
 */
 -- Creamos la base de datos si no existe
 CREATE DATABASE IF NOT EXISTS gestion_veterinaria;
 
 USE gestion_veterinaria;
+-- Catálogos de Ubicación
+-- PROVINCIAS (catálogo de provincias)
+CREATE TABLE provincia (
+    id      BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    
+    -- RESTRICCIONES DE DATOS (reglas para las columnas) 
+    CONSTRAINT chk_nombre_provincia CHECK (TRIM(nombre) <> '')
+);
+
+--  COD_POSTAL (catálogo de códigos postales, incluyendo localidad)
+CREATE TABLE cod_postal (
+  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+  cod_postal   VARCHAR(10) NOT NULL,
+  localidad    VARCHAR(80)  NOT NULL,
+  provincia_id BIGINT NOT NULL,
+  
+  -- RELACIONES (conexiones con otras tablas)
+  CONSTRAINT fk_provincia
+    FOREIGN KEY (provincia_id) REFERENCES provincia(id)
+        ON UPDATE CASCADE    -- Si cambia el id_provincia, se actualiza aquí
+        ON DELETE RESTRICT,  -- No permite borrar provincias con códigos postales
+    
+   -- RESTRICCIONES DE DATOS (reglas para las columnas) 
+    CONSTRAINT chk_localidad CHECK (TRIM(localidad) <> '') -- Evita que la localidad sea una cadena vacía o solo espacios en blanco.
+);
+
+-- DIRECCION (calle, número y referencia al código postal)
+--    Tabla reutilizable por Persona y Veterinaria
+CREATE TABLE direccion (
+  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+  calle        VARCHAR(120) NOT NULL,
+  numero       VARCHAR(10),
+  cod_postal_id   BIGINT  NOT NULL,
+  
+  -- RELACIONES (conexiones con otras tablas)
+  CONSTRAINT fk_direccion_cod_postal
+    FOREIGN KEY (cod_postal_id) REFERENCES cod_postal(id),
+    
+  -- RESTRICCIONES ADICIONALES
+  CONSTRAINT chk_calle CHECK (TRIM(calle) <> '') -- Evita que la calle sea una cadena vacía o solo espacios en blanco.
+);
+
+-- Catálogos de Clasificación:
+-- ESPECIE
+CREATE TABLE especie(
+	id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+	nombre      VARCHAR(60)  NOT NULL UNIQUE,
+    
+-- RESTRICCIONES DE DATOS (reglas para las columnas)
+	CONSTRAINT chk_nombre_especie CHECK (TRIM(nombre) <> '') -- Asegura que el código no sea una cadena vacía o solo espacios.
+);
+
+-- RAZA
+CREATE TABLE raza(
+	id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre      VARCHAR(60)  NOT NULL,
+    especie_id  BIGINT NOT NULL,
+    
+    -- RELACIONES 
+     CONSTRAINT fk_raza_especie
+        FOREIGN KEY (especie_id) REFERENCES especie(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,  -- no permite borrar una especie si tiene razas asociadas
+    
+    -- RESTRICCIONES DE DATOS
+    CONSTRAINT uq_raza_nombre_especie
+        UNIQUE (nombre, especie_id), -- evita duplicar razas dentro de la misma especie  
+    CONSTRAINT chk_nombre_raza CHECK (TRIM(nombre) <> '')  -- Asegura que el código no sea una cadena vacía o solo espacios.  
+);
 
 --  PERSONA: La tabla general con los datos compartidos de DUEÑO y VETERINARIO
 CREATE TABLE persona (
@@ -132,77 +202,4 @@ CREATE TABLE implantacion (
     ON DELETE CASCADE -- Si se borra el microchip, este registro de implantación también se borra
   
 );
-
--- PRUEBA DE INSERCION DATOS MANUAL
-
--- INSERTAR DATOS EN TABLAS INDEPENDIENTES
--- Insertamos una provincia
-INSERT INTO provincia (nombre) VALUES ('Buenos Aires');
-
--- Insertamos dos especie
-INSERT INTO especie (nombre) VALUES 
-('Perro'), 
-('Gato');
-
--- Insertamos dos personas
-INSERT INTO persona (dni, nombre, apellido, telefono, email) VALUES 
-('30111222', 'Carlos', 'Gomez', '1155667788', 'carlos31@gmail.com'),
-('35888999', 'Ana', 'Perez', '1122334455', 'ana-perez@gmail.com');
-
--- Insertamos la clínica veterinaria
-INSERT INTO veterinaria (nombre, telefono, email) VALUES 
-('Clínica Animal', '4484-1234', 'contacto@animal.vet');
-
--- Insertamos un microchip (aún no asignado a ninguna mascota)
-INSERT INTO microchip (codigo) 
-VALUES ('A1B2-C3D4-E5F6');
-
--- INSERTAR DATOS EN TABLAS DEPENDIENTES
-
--- Insertamos un código postal
-INSERT INTO cod_postal (cod_postal, localidad, provincia_id) VALUES 
-('1754', 'San Justo', 1),
-('1425', 'Palermo', 1); 
-
--- Insertamos direcciones 
-INSERT INTO direccion (calle, numero, cod_postal_id) VALUES 
-('Av. Rivadavia', '1234', 1), -- Dirección para Carlos
-('Av. Corrientes', '5678', 2); -- Dirección para la clínica
-
--- Asignamos el rol de veterinario a una personas que creamos
-INSERT INTO veterinario (id, matricula_profesional, veterinaria_id) 
-VALUES (2, 'MN-12345', 1); -- id=2 (Ana), veterinaria_id=1 (Clínica Animal)
-
--- Insertamos razas
-INSERT INTO raza (id, nombre, especie_id) VALUES 
-(1, 'Golden Retriever', 1), -- especie_id = 1 (Perro)
-(2, 'Siamés', 2);           -- especie_id = 2 (Gato)
-
--- Registramos una mascota para el dueño Carlos
-INSERT INTO mascota (nombre, raza_id, fecha_nacimiento, duenio_id, microchip_id) VALUES 
-('Bruss', 1, '2022-05-10', 1, 1); -- Bruss es un Golden Retrieve (id=1) de Carlos (id=1) y le asignamos el microchip (id=1)
-
--- Registramos la implantación de ese microchip
-INSERT INTO implantacion (fecha_implantacion, veterinario_id, microchip_id) VALUES
-('2022-08-01', 2, 1); -- La implantación la hizo Ana (id=2) al microchip (id=1)
-
-
--- INSERCCIONES ERRONEAS
-
---  Violar UNIQUE (Clave Única): Fallará porque el DNI '30111222' (de Carlos Gomez) ya está en uso.
-INSERT INTO persona (dni, nombre, apellido) VALUES 
-('30111222', 'Roberto', 'Franco'); -- Error Code: 1062. Duplicate entry '30111222' for key 'dni'	
-
--- Violar CHECK (Verificación de Datos): Fallará porque el nombre no puede ser una cadena vacía.
-INSERT INTO veterinaria (nombre) VALUES (''); -- Error Code: 4025. CONSTRAINT `chk_veterinaria_nombre` failed for `gestion_veterinaria`.`veterinaria`	
-
--- Violar FOREIGN KEY (Clave Foránea): Fallará porque no hay ningún dueño con id=99.
-INSERT INTO mascota (nombre, raza_id, duenio_id) VALUES 
-('Fito', 'Perro', 99); -- Error Code: 1452. Cannot add or update a child row: a foreign key constraint fails (`gestion_veterinaria`.`mascota`, CONSTRAINT `fk_mascota_duenio` FOREIGN KEY (`duenio_id`) REFERENCES `duenio` (`id`))	
-
--- Violar ON DELETE RESTRICT: Fallará porque Carlos (id=1) es referenciado en la tabla 'mascota'.
-DELETE FROM persona WHERE id = 1; -- Error Code: 1451. Cannot delete or update a parent row: a foreign key constraint fails (`gestion_veterinaria`.`mascota`, CONSTRAINT `fk_mascota_duenio` FOREIGN KEY (`duenio_id`) REFERENCES `persona` (`id`))
-
-
-
 
