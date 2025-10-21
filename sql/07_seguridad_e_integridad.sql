@@ -1,5 +1,5 @@
 /*Este script implementa la seguridad y validación de la BBDD gestion_veterinaria.
-    Crea un usuario 'usuario_consulta' con privilegios mínimos.
+    Crea un usuario 'usuario_consulta' con privilegios mínimos..
     Define vistas para ocultar datos sensibles (DNI, microchip).
     Contiene un Stored Procedure seguro y pruebas de integridad (PK/FK). */
 
