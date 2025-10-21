@@ -1,3 +1,8 @@
+/** Este script tiene como objetivo poblar la base de datos 'gestion_veterinaria'
+con un volumen de datos masivo, controlado y consistente, cumpliendo con
+los requisitos de la Etapa 2 del TFI.
+*/
+
 USE gestion_veterinaria;
 
 -- 1: CONFIGURACIÓN DE PARÁMETROS Y LIMPIEZA DEL ESQUEMA
